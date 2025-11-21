@@ -431,7 +431,7 @@ body::before {
         .empty-state {
             text-align: center;
             padding: 3rem;
-            color: #666;
+            color: white;
         }
 
         .empty-state h2 {
@@ -469,12 +469,6 @@ body::before {
                 min-width: auto;
             }
         }
-
-
-
-
-
-
 
 
         /* Smaller Recipe Grid */
@@ -557,13 +551,12 @@ body::before {
 }
 
 .custom{
-    
     font-family: 'Dancing Script', cursive;
     font-size: 42px;
     color: #c22237; /* similar purple shade */
    
 }
-.container h1{
+.container-head h1{
     color: white;
     font-size: 22px;
 }
