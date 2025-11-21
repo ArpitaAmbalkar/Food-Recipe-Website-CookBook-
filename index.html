@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Web App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap">
+    <script src="script.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='%235D688A'>🍳</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600&display=swap" rel="stylesheet">
+    
+</head>
+<body>
+   <header>
+        <div class="container">
+            
+            <div class="header-content">
+                <img src="Assets/app_logo.png" class="logo">
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-view="home">Home</a></li>
+                        <li><a href="#" class="nav-link" data-view="form">Add Recipe</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Home View -->
+         <div class="container-head">
+            <h1>SIMPLE RECIPES MADE FOR</h1><p class="custom">real, actual, everyday life.</p>
+         </div>
+         
+        <section id="home-view" class="view active">
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search recipes...">
+                </div>
+                <div class="filter-box">
+                    <select id="difficulty-filter">
+                        <option value="all">All Difficulties</option>
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <!-- Add this after the difficulty filter in your home view -->
+<div class="filter-box">
+    <select id="prep-time-filter">
+        <option value="0">Max Prep Time</option>
+        <option value="10">10 min or less</option>
+        <option value="15">15 min or less</option>
+        <option value="20">20 min or less</option>
+        <option value="30">30 min or less</option>
+        <option value="60">60 min or less</option>
+        <option value="999">Any time</option>
+    </select>
+</div>
+                <button class="add-recipe-btn" id="add-recipe-btn">Add Recipe</button>
+            </div>
+            <div id="recipe-grid" class="recipe-grid">
+                <!-- Recipe cards will be dynamically inserted here -->
+            </div>
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <h2>No recipes found</h2>
+                <p>Try adjusting your search or add a new recipe.</p>
+            </div>
+        </section>
+
+        <!-- Recipe Detail View -->
+        <section id="detail-view" class="view">
+            <div id="recipe-detail" class="recipe-detail">
+                <!-- Recipe details will be dynamically inserted here -->
+            </div>
+            <button class="back-btn" id="detail-back-btn">Back to Recipes</button>
+        </section>
+
+        <!-- Add/Edit Recipe Form -->
+        <section id="form-view" class="view">
+            <div class="recipe-form">
+                <h2 id="form-title">Add New Recipe</h2>
+                <form id="recipe-form">
+                    <div class="form-group">
+                        <label for="recipe-title">Title *</label>
+                        <input type="text" id="recipe-title" required>
+                        <div class="error-message" id="title-error">Title is required</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipe-description">Description</label>
+                        <textarea id="recipe-description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipe-image">Image URL</label>
+                        <input type="text" id="recipe-image">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="prep-time">Prep Time (minutes) *</label>
+                            <input type="number" id="prep-time" min="1" required>
+                            <div class="error-message" id="prep-time-error">Prep time is required and must be at least 1 minute</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cook-time">Cook Time (minutes) *</label>
+                            <input type="number" id="cook-time" min="1" required>
+                            <div class="error-message" id="cook-time-error">Cook time is required and must be at least 1 minute</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipe-difficulty">Difficulty *</label>
+                        <select id="recipe-difficulty" required>
+                            <option value="">Select Difficulty</option>
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                        <div class="error-message" id="difficulty-error">Difficulty is required</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Ingredients *</label>
+                        <div id="ingredients-container">
+                            <div class="ingredient-item">
+                                <input type="text" class="ingredient-input" placeholder="Ingredient" required>
+                                <button type="button" class="remove-btn">×</button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-btn" id="add-ingredient-btn">Add Ingredient</button>
+                        <div class="error-message" id="ingredients-error">At least one ingredient is required</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Steps *</label>
+                        <div id="steps-container">
+                            <div class="step-item">
+                                <input type="text" class="step-input" placeholder="Step description" required>
+                                <button type="button" class="remove-btn">×</button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-btn" id="add-step-btn">Add Step</button>
+                        <div class="error-message" id="steps-error">At least one step is required</div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn" id="submit-btn">Save Recipe</button>
+                        <button type="button" class="cancel-btn" id="cancel-btn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
