@@ -507,76 +507,94 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Render recipe grid
-    function renderRecipeGrid() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const difficultyFilterValue = difficultyFilter.value;
-        const prepTimeFilterValue = parseInt(prepTimeFilter.value);
+    // Render recipe grid
+function renderRecipeGrid() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const difficultyFilterValue = difficultyFilter.value;
+    const prepTimeFilterValue = parseInt(prepTimeFilter.value);
+    
+    // Filter recipes
+    const filteredRecipes = recipes.filter(recipe => {
+        const matchesSearch = recipe.title.toLowerCase().includes(searchTerm) || 
+                             recipe.description.toLowerCase().includes(searchTerm);
+        const matchesDifficulty = difficultyFilterValue === 'all' || 
+                                 recipe.difficulty === difficultyFilterValue;
+        const matchesPrepTime = prepTimeFilterValue === 0 || 
+                               recipe.prepTime <= prepTimeFilterValue;
         
-        // Filter recipes
-        const filteredRecipes = recipes.filter(recipe => {
-            const matchesSearch = recipe.title.toLowerCase().includes(searchTerm) || 
-                                 recipe.description.toLowerCase().includes(searchTerm);
-            const matchesDifficulty = difficultyFilterValue === 'all' || 
-                                     recipe.difficulty === difficultyFilterValue;
-            const matchesPrepTime = prepTimeFilterValue === 0 || 
-                                   recipe.prepTime <= prepTimeFilterValue;
-            
-            return matchesSearch && matchesDifficulty && matchesPrepTime;
-        });
-        
-        // Update empty state
-        if (filteredRecipes.length === 0) {
-            emptyState.style.display = 'block';
-            recipeGrid.style.display = 'none';
-        } else {
-            emptyState.style.display = 'none';
-            recipeGrid.style.display = 'grid';
-        }
-        
-        // Render recipe cards
-        recipeGrid.innerHTML = '';
-        filteredRecipes.forEach(recipe => {
-            const card = document.createElement('div');
-            card.className = 'recipe-card';
-            card.innerHTML = `
+        return matchesSearch && matchesDifficulty && matchesPrepTime;
+    });
+    
+    // Update empty state
+    if (filteredRecipes.length === 0) {
+        emptyState.style.display = 'block';
+        recipeGrid.style.display = 'none';
+    } else {
+        emptyState.style.display = 'none';
+        recipeGrid.style.display = 'grid';
+    }
+    
+    // Render recipe cards
+    recipeGrid.innerHTML = '';
+    filteredRecipes.forEach(recipe => {
+        const card = document.createElement('div');
+        card.className = 'recipe-card';
+        card.innerHTML = `
+            <div class="recipe-image-container">
                 <img src="${recipe.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80'}" 
                      alt="${recipe.title}" class="recipe-image" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80'">
-                <div class="recipe-content">
-                    <h3 class="recipe-title">${recipe.title}</h3>
-                    <div class="recipe-meta">
-                        <span>${recipe.prepTime + recipe.cookTime} min</span>
-                        <span class="recipe-difficulty difficulty-${recipe.difficulty}">${recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1)}</span>
-                    </div>
-                    <p class="recipe-description">${recipe.description}</p>
-                    <div class="recipe-actions">
-                        <button class="btn btn-view" data-id="${recipe.id}">View</button>
-                        <button class="btn btn-edit" data-id="${recipe.id}">Edit</button>
-                        <button class="btn btn-delete" data-id="${recipe.id}">Delete</button>
-                    </div>
+                <button class="favorite-btn ${isFavorite(recipe.id) ? 'active' : ''}" 
+                        data-recipe-id="${recipe.id}">
+                    <span class="heart-icon">${isFavorite(recipe.id) ? '♥' : '♡'}</span>
+                </button>
+            </div>
+            <div class="recipe-content">
+                <h3 class="recipe-title">${recipe.title}</h3>
+                <div class="recipe-meta">
+                    <span>${recipe.prepTime + recipe.cookTime} min</span>
+                    <span class="recipe-difficulty difficulty-${recipe.difficulty}">${recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1)}</span>
                 </div>
-            `;
-            recipeGrid.appendChild(card);
+                <p class="recipe-description">${recipe.description}</p>
+                <div class="recipe-actions">
+                    <button class="btn btn-view" data-id="${recipe.id}">View</button>
+                    <button class="btn btn-edit" data-id="${recipe.id}">Edit</button>
+                    <button class="btn btn-delete" data-id="${recipe.id}">Delete</button>
+                </div>
+            </div>
+        `;
+        recipeGrid.appendChild(card);
+    });
+    
+    // Add event listeners to action buttons
+    document.querySelectorAll('.btn-view').forEach(btn => {
+        btn.addEventListener('click', function() {
+            showRecipeDetail(this.getAttribute('data-id'));
         });
-        
-        // Add event listeners to action buttons
-        document.querySelectorAll('.btn-view').forEach(btn => {
-            btn.addEventListener('click', function() {
-                showRecipeDetail(this.getAttribute('data-id'));
-            });
+    });
+    
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', function() {
+            showEditForm(this.getAttribute('data-id'));
         });
-        
-        document.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.addEventListener('click', function() {
-                showEditForm(this.getAttribute('data-id'));
-            });
+    });
+      
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', function() {
+            deleteRecipe(this.getAttribute('data-id'));
         });
-          
-        document.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', function() {
-                deleteRecipe(this.getAttribute('data-id'));
-            });
+    });
+    
+    // Add event listener for favorite buttons
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const recipeId = this.getAttribute('data-recipe-id');
+            const isNowFavorite = toggleFavorite(recipeId);
+            
+            this.classList.toggle('active', isNowFavorite);
+            this.querySelector('.heart-icon').textContent = isNowFavorite ? '♥' : '♡';
         });
-    }
+    });
+}
 
     // Show recipe detail
     function showRecipeDetail(recipeId) {
@@ -656,6 +674,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    //add
+    // Favorite system functions
+function initializeFavorites() {
+    return JSON.parse(localStorage.getItem('favoriteRecipes')) || [];
+}
+
+function saveFavorites(favorites) {
+    localStorage.setItem('favoriteRecipes', JSON.stringify(favorites));
+}
+
+function toggleFavorite(recipeId) {
+    const favorites = initializeFavorites();
+    const index = favorites.indexOf(recipeId);
+    
+    if (index > -1) {
+        favorites.splice(index, 1);
+    } else {
+        favorites.push(recipeId);
+    }
+    
+    saveFavorites(favorites);
+    return !(index > -1);
+}
+
+function isFavorite(recipeId) {
+    const favorites = initializeFavorites();
+    return favorites.includes(recipeId);
+}
     // Initialize the application
     init();
 });
@@ -677,3 +723,33 @@ function toggleDarkMode() {
 if (localStorage.getItem('theme') === 'light') {
     document.body.classList.add('light-mode');
 }
+
+/*EXTRA 2*/
+
+// Minimal music player
+document.addEventListener('DOMContentLoaded', function() {
+    const musicToggle = document.getElementById('music-toggle');
+    let music = null;
+    let playing = false;
+    
+    musicToggle.addEventListener('click', function() {
+        if (!music) {
+            // Create audio on first click (user interaction required)
+            music = new Audio('cooking-time-happy-cooking-food-music-336562.mp3');
+            music.loop = true;
+            music.volume = 0.3;
+        }
+        
+        if (playing) {
+            music.pause();
+            this.classList.remove('playing');
+            this.textContent = '🎵';
+            playing = false;
+        } else {
+            music.play();
+            this.classList.add('playing');
+            this.textContent = '🎶';
+            playing = true;
+        }
+    });
+});
