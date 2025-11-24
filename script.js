@@ -29,7 +29,209 @@ document.addEventListener('DOMContentLoaded', function() {
         renderRecipeGrid();
         setupEventListeners();
     }
+    // Simple PDF Download
+// Working PDF Download using Print to PDF
+function downloadRecipePDF(recipeId) {
+    const recipe = recipes.find(r => r.id === recipeId);
+    if (!recipe) return;
 
+    // Create a print-friendly version
+    const printContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>${recipe.title} - Simple Recipes</title>
+            <style>
+                @media print {
+                    @page { margin: 1cm; }
+                }
+                body { 
+                    font-family: 'Segoe UI', Arial, sans-serif; 
+                    line-height: 1.6; 
+                    color: #333; 
+                    max-width: 800px; 
+                    margin: 0 auto; 
+                    padding: 20px;
+                    background: white;
+                }
+                .header { 
+                    text-align: center; 
+                    border-bottom: 3px solid #ff6b6b; 
+                    padding-bottom: 20px; 
+                    margin-bottom: 30px; 
+                }
+                .title { 
+                    font-size: 28px; 
+                    margin-bottom: 10px; 
+                    color: #333;
+                    font-weight: bold;
+                }
+                .description {
+                    color: #666;
+                    font-size: 16px;
+                    font-style: italic;
+                    margin-bottom: 20px;
+                }
+                .meta-grid { 
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 15px;
+                    margin: 25px 0;
+                    max-width: 400px;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+                .meta-item {
+                    background: #f8f9fa;
+                    padding: 12px;
+                    border-radius: 8px;
+                    text-align: center;
+                    border-left: 4px solid #ff6b6b;
+                }
+                .meta-label {
+                    font-size: 12px;
+                    color: #666;
+                    text-transform: uppercase;
+                    margin-bottom: 5px;
+                }
+                .meta-value {
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: #333;
+                }
+                .section { 
+                    margin-bottom: 30px; 
+                    page-break-inside: avoid;
+                }
+                .section-title { 
+                    border-bottom: 2px solid #ff6b6b; 
+                    padding-bottom: 8px; 
+                    margin-bottom: 15px; 
+                    color: #333;
+                    font-size: 20px;
+                }
+                .ingredients-list { 
+                    list-style: none;
+                    padding: 0;
+                }
+                .ingredients-list li { 
+                    margin-bottom: 8px; 
+                    padding: 8px;
+                    background: #f8f9fa;
+                    border-radius: 5px;
+                    border-left: 3px solid #4CAF50;
+                }
+                .steps-list { 
+                    list-style: none;
+                    padding: 0;
+                    counter-reset: step-counter;
+                }
+                .steps-list li { 
+                    margin-bottom: 15px; 
+                    padding: 15px;
+                    background: white;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 8px;
+                    position: relative;
+                    padding-left: 60px;
+                }
+                .steps-list li:before {
+                    counter-increment: step-counter;
+                    content: counter(step-counter);
+                    position: absolute;
+                    left: 15px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: #ff6b6b;
+                    color: white;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                }
+                .footer { 
+                    margin-top: 50px; 
+                    text-align: center; 
+                    color: #666; 
+                    border-top: 1px solid #ddd; 
+                    padding-top: 20px; 
+                    font-style: italic;
+                    font-size: 14px;
+                }
+                .app-logo {
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #ff6b6b;
+                    margin-bottom: 10px;
+                }
+                .print-date {
+                    color: #999;
+                    font-size: 12px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="app-logo">🍳 Simple Recipes</div>
+                <h1 class="title">${recipe.title}</h1>
+                <p class="description">${recipe.description}</p>
+                
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <div class="meta-label">Prep Time</div>
+                        <div class="meta-value">${recipe.prepTime} minutes</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Cook Time</div>
+                        <div class="meta-value">${recipe.cookTime} minutes</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Total Time</div>
+                        <div class="meta-value">${recipe.prepTime + recipe.cookTime} minutes</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Difficulty</div>
+                        <div class="meta-value">${recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1)}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">📋 Ingredients</h2>
+                <ul class="ingredients-list">
+                    ${recipe.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">👨‍🍳 Cooking Instructions</h2>
+                <ol class="steps-list">
+                    ${recipe.steps.map(step => `<li>${step}</li>`).join('')}
+                </ol>
+            </div>
+            
+            <div class="footer">
+                <p>Printed from Simple Recipes • Your personal recipe collection</p>
+                <p class="print-date">Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+                <p>Happy Cooking! 🎉</p>
+            </div>
+        </body>
+        </html>
+    `;
+
+    // Open print dialog for PDF saving
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    
+    // Wait for content to load then trigger print
+    setTimeout(() => {
+        printWindow.print();
+    }, 500);
+}
     // Load recipes from localStorage
     function loadRecipes() {
         try {
@@ -629,6 +831,7 @@ function renderRecipeGrid() {
                     <div class="recipe-actions">
                         <button class="btn btn-edit" id="detail-edit-btn" data-id="${recipe.id}">Edit</button>
                         <button class="btn btn-delete" id="detail-delete-btn" data-id="${recipe.id}">Delete</button>
+                        <button class="btn btn-pdf" id="detail-pdf-btn" data-id="${recipe.id}">📥 Export PDF</button>
                     </div>
                 </div>
             </div>
@@ -656,6 +859,10 @@ function renderRecipeGrid() {
         document.getElementById('detail-delete-btn').addEventListener('click', function() {
             deleteRecipe(this.getAttribute('data-id'));
         });
+        // Add this with your other event listeners in showRecipeDetail():
+document.getElementById('detail-pdf-btn').addEventListener('click', function() {
+    downloadRecipePDF(this.getAttribute('data-id'));
+});
         
         showView('detail');
     }
@@ -753,3 +960,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+
