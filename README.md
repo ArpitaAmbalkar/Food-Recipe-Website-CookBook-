@@ -115,10 +115,12 @@ The app stores all data under the key `"recipes"` in your browser's localStorage
 
 
 
-🏅 Extra Features Implemented (Beyond Requirements)
-Feature	Benefit
-PDF Download using Print API	Quick printable recipe report
-Prep Time filter	More advanced filtering
+| Feature                          | Benefit                       |
+| -------------------------------- | ----------------------------- |
+|   PDF Download using Print API   | Quick printable recipe report |
+|   Prep Time filter               | More advanced filtering       |
+
+
 
 
 ## 📄 License & Credits
